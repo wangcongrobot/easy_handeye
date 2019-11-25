@@ -1,36 +1,36 @@
 <launch>
-    <arg name="namespace_prefix" default="ur5_kinect_handeyecalibration" />
+    <arg name="namespace_prefix" default="husky_ur5_stereo_handeyecalibration" />
 
     <arg name="robot_ip" doc="The IP address of the UR5 robot" />
 
-    <arg name="marker_size" doc="Size of the ArUco marker used, in meters" />
-    <arg name="marker_id" doc="The ID of the ArUco marker used" />
+    <arg name="marker_size" value="0.095" doc="Size of the ArUco marker used, in meters" />
+    <arg name="marker_id" value="100" doc="The ID of the ArUco marker used" />
 
     <!-- start the Kinect -->
-    <include file="$(find freenect_launch)/launch/freenect.launch" >
+    <!-- <include file="$(find freenect_launch)/launch/freenect.launch" >
         <arg name="depth_registration" value="true" />
-    </include>
+    </include> -->
 
     <!-- start ArUco -->
     <node name="aruco_tracker" pkg="aruco_ros" type="single">
-        <remap from="/camera_info" to="/camera/rgb" />
-        <remap from="/image" to="/camera/rgb/image_rect_color" />
+        <remap from="/camera_info" to="/stereo_camera/left/camera_info" />
+        <remap from="/image" to="/stereo_camera/left/image_rect_color" />
         <param name="image_is_rectified" value="true"/>
         <param name="marker_size"        value="$(arg marker_size)"/>
         <param name="marker_id"          value="$(arg marker_id)"/>
         <param name="reference_frame"    value="camera_link"/>
-        <param name="camera_frame"       value="camera_rgb_optical_frame"/>
+        <param name="camera_frame"       value="stereo_camera"/>
         <param name="marker_frame"       value="camera_marker" />
     </node>
 
     <!-- start the robot -->
-    <include file="$(find ur_bringup)/launch/ur5_bringup.launch">
+    <!-- <include file="$(find ur_bringup)/launch/ur5_bringup.launch">
         <arg name="limited" value="true" />
         <arg name="robot_ip" value="192.168.0.21" />
     </include>
     <include file="$(find ur5_moveit_config)/launch/ur5_moveit_planning_execution.launch">
         <arg name="limited" value="true" />
-    </include>
+    </include> -->
 
     <!-- start easy_handeye -->
     <include file="$(find easy_handeye)/launch/calibrate.launch" >
@@ -39,12 +39,14 @@
 
         <arg name="tracking_base_frame" value="camera_link" />
         <arg name="tracking_marker_frame" value="camera_marker" />
-        <arg name="robot_base_frame" value="base_link" />
-        <arg name="robot_effector_frame" value="wrist_3_link" />
+        <arg name="robot_base_frame" value="r_ur5_arm_base_link" />
+        <arg name="robot_effector_frame" value="r_ur5_arm_ee_link" />
 
         <arg name="freehand_robot_movement" value="false" />
         <arg name="robot_velocity_scaling" value="0.5" />
         <arg name="robot_acceleration_scaling" value="0.2" />
+
+        <arg name="move_group" value="right_arm" />
     </include>
 
 </launch>
